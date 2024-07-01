@@ -9,19 +9,20 @@ escpos.USB = require("escpos-usb");
 // const ip = "192.168.241.77";
 const ip = "192.168.1.179";
 
-const printReceipt = (
-  customerName,
-  checkoutItems,
-  totalCups,
-  subTotal,
-  discount,
-  totalPrice
-) => {
+// const printReceipt = (
+//   customerName,
+//   checkoutItems,
+//   totalCups,
+//   subTotal,
+//   discount,
+//   totalPrice
+// ) => {
+const printReceipt = () => {
   const device = new escpos.USB();
   const options = { encoding: "TIS-620", width: 80 };
   const printer = new escpos.Printer(device, options);
   // Path to png image
-  const filePath = path.join(__dirname, "the-purist-logo.png");
+  const filePath = path.join(__dirname, "../assets/viet-cuisine-logo.webp");
 
   escpos.Image.load(filePath, (image) => {
     device.open(async function (err) {
@@ -55,9 +56,9 @@ const printReceipt = (
 
         checkoutItems.forEach((item) => {
           printer.tableCustom([
-            { align: "LEFT", width: 0.1, text: item.unit },
-            { align: "LEFT", width: 0.5, text: item.flavorType },
-            { align: "RIGHT", width: 0.3, text: item.price },
+            { align: "LEFT", width: 0.1, text: "test" },
+            { align: "LEFT", width: 0.5, text: "test2" },
+            { align: "RIGHT", width: 0.3, text: "400.00" },
           ]);
         });
 
@@ -65,28 +66,29 @@ const printReceipt = (
         printer
           .drawLine("-")
           .align("LT")
-          .text(`Total cup: ${totalCups}`)
+          .text(`Total cup: ${1}`)
           .align("RT");
 
         if (discount === undefined || parseFloat(discount) !== 0) {
           printer
             .tableCustom([
               { align: "LEFT", width: 0.3, text: "SubTotal:" },
-              { align: "RIGHT", width: 0.2, text: subTotal },
+              { align: "RIGHT", width: 0.2, text: "400.00" },
             ])
             .tableCustom([
               { align: "LEFT", width: 0.3, text: "Discount:" },
-              { align: "RIGHT", width: 0.2, text: discount },
+              { align: "RIGHT", width: 0.2, text: "0.00" },
             ]);
         }
         printer
           .text("-------------------")
           .tableCustom([
             { align: "LEFT", width: 0.4, text: "Total Price:" },
-            { align: "RIGHT", width: 0.2, text: totalPrice },
+            { align: "RIGHT", width: 0.2, text: "400.00" },
           ])
           .text("-------------------");
 
+        printer.feed(1).align("CT").text("เทสเทสเทส").feed(2);
         printer.feed(1).align("CT").text(thankYouText).feed(2).close();
       };
 
@@ -104,24 +106,11 @@ app.use(bodyParser.json());
 app.use(cors(corsOptions));
 
 app.post("/print", async (req, res) => {
+  console.log('called');
   try {
-    const {
-      customerName,
-      checkoutItems,
-      totalCups,
-      subTotal,
-      discount,
-      totalPrice,
-    } = req.body;
-
-    printReceipt(
-      customerName,
-      checkoutItems,
-      totalCups,
-      subTotal,
-      discount,
-      totalPrice
-    );
+    // const {} = req.body;
+    console.log("try")
+    printReceipt();
     // Send success response
     res.status(200).json({ message: "Receipt printed successfully" });
   } catch (error) {
